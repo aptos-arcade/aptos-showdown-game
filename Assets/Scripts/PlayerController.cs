@@ -1,6 +1,7 @@
 using UnityEngine;
+using Photon.Pun;
 
-public class PlayerController : MonoBehaviour
+public class PlayerController : MonoBehaviourPunCallbacks
 {
 
     // components on player game object; set in Start
@@ -13,6 +14,10 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private LayerMask groundLayer;
     [SerializeField] private GameObject bulletImpact;
     [SerializeField] private Gun[] allGuns;
+    [SerializeField] private GameObject playerHitImpact;
+    [SerializeField] private GameObject playerModel;
+    [SerializeField] private Transform modelGunPoint;
+    [SerializeField] private Transform gunHolder;
 
     // user settings; set in Inspector - this will be changed later
     [Header("User Settings")]
@@ -25,6 +30,8 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float runSpeed = 10f;
     [SerializeField] private float jumpForce = 15f;
     [SerializeField] private float gravityModifier = 2.5f;
+    [SerializeField] private int maxHealth = 100;
+    [SerializeField] private Animator playerAnimator;
     
     [Header("Gun Stats")]
     [SerializeField] private float maxHeat = 10f;
@@ -42,12 +49,17 @@ public class PlayerController : MonoBehaviour
     private float _activeMoveSpeed;
     private bool _isGrounded;
     private int _currentGunIndex;
+    private int _currentHealth;
     
     // gun state variables
     private float _shotCounter;
     private float _heatCounter;
     private bool _isOverheated;
     private float _muzzleFlashCounter;
+    
+    // animator hashes
+    private static readonly int Speed = Animator.StringToHash("speed");
+    private static readonly int Grounded = Animator.StringToHash("grounded");
 
     // Start is called before the first frame update
     private void Start()
@@ -62,26 +74,41 @@ public class PlayerController : MonoBehaviour
         _camera = Camera.main;
         
         // set initial gun
-        ChangeGun();
+        photonView.RPC("SetGun", RpcTarget.AllBuffered, 0);
         
-        // set spawn point
-        var spawnPoint = SpawnManager.Instance.GetSpawnPoint();
-        transform.position = spawnPoint.position;
-        transform.rotation = spawnPoint.rotation;
+        // set initial health
+        _currentHealth = maxHealth;
+
+        if (photonView.IsMine)
+        {
+            playerModel.SetActive(false);
+            UIController.Instance.SetMaxHealthSliderValue(maxHealth);
+            UIController.Instance.SetHealthSliderValue(_currentHealth);
+        }
+        else
+        {
+            gunHolder.parent = modelGunPoint;
+            gunHolder.localPosition = Vector3.zero;
+            gunHolder.localRotation = Quaternion.identity;
+        }
+        
     }
 
     // Update is called once per frame
     private void Update()
     {
+        if (!photonView.IsMine) return;
         HandleCamera();
         HandleMovement();
         HandleMouseLock();
         HandleShoot();
         HandleChangeGun();
+        HandleAnimation();
     }
     
     private void LateUpdate()
     {
+        if (!photonView.IsMine) return;
         _camera.transform.position = viewPoint.position;
         _camera.transform.rotation = viewPoint.rotation;
     }
@@ -125,7 +152,7 @@ public class PlayerController : MonoBehaviour
             if(Input.GetButtonDown("Jump"))newMovement.y = jumpForce;
             else _movement.y = 0f;
         }
-        
+
         // apply gravity
         newMovement.y += Physics.gravity.y * Time.deltaTime * gravityModifier;
         
@@ -192,10 +219,28 @@ public class PlayerController : MonoBehaviour
         ray.origin = _camera.transform.position;
         
         // handle bullet impact
-        if (!Physics.Raycast(ray, out var hit)) return;
-        var bulletImpactObject = Instantiate(bulletImpact, hit.point + hit.normal * 0.002f,
-            Quaternion.LookRotation(hit.normal, Vector3.up));
-        Destroy(bulletImpactObject, 10f);
+        if (Physics.Raycast(ray, out var hit))
+        {
+            if (hit.collider.gameObject.CompareTag("Player"))
+            {
+                Debug.Log("Hit player " + hit.collider.gameObject.GetPhotonView().Owner.NickName);
+                PhotonNetwork.Instantiate(playerHitImpact.name, hit.point, Quaternion.identity);
+                hit.collider.gameObject.GetPhotonView().RPC(
+                    "DealDamage", 
+                    RpcTarget.All, 
+                    PhotonNetwork.LocalPlayer.NickName, 
+                    allGuns[_currentGunIndex].ShotDamage
+                );
+            }
+            else
+            {
+                var bulletImpactObject = Instantiate(bulletImpact, hit.point + hit.normal * 0.002f,
+                    Quaternion.LookRotation(hit.normal, Vector3.up));
+                Destroy(bulletImpactObject, 10f);
+            }
+            
+        }
+        
         
         // reset shot counter
         _shotCounter = allGuns[_currentGunIndex].TimeBetweenShots;
@@ -215,13 +260,34 @@ public class PlayerController : MonoBehaviour
 
     }
 
+    [PunRPC]
+    public void DealDamage(string damageDealer, int damageAmount)
+    {
+        TakeDamage(damageDealer, damageAmount);
+    }
+
+    private void TakeDamage(string damageDealer, int damageAmount)
+    {
+        if (!photonView.IsMine) return;
+        
+        _currentHealth -= damageAmount;
+        
+        if (_currentHealth <= 0)
+        {
+            _currentHealth = 0;
+            PlayerSpawner.Instance.OnDeath(damageDealer);
+        }
+        
+        UIController.Instance.SetHealthSliderValue(_currentHealth);
+    }
+
     private void HandleChangeGun()
     {
         for(int i = 0; i < allGuns.Length; i++)
         {
             if (!Input.GetKeyDown((i + 1).ToString())) continue;
             _currentGunIndex = i;
-            ChangeGun();
+            photonView.RPC("SetGun", RpcTarget.AllBuffered, i);
         }
     }
 
@@ -233,6 +299,20 @@ public class PlayerController : MonoBehaviour
         }
         allGuns[_currentGunIndex].gameObject.SetActive(true);
         allGuns[_currentGunIndex].MuzzleFlash.SetActive(false);
+    }
+    
+    [PunRPC]
+    public void SetGun(int gunIndex)
+    {
+        if(gunIndex < 0 || gunIndex >= allGuns.Length) return;
+        _currentGunIndex = gunIndex;
+        ChangeGun();
+    }
+    
+    private void HandleAnimation()
+    {
+        playerAnimator.SetFloat(Speed, _moveDirection.magnitude);
+        playerAnimator.SetBool(Grounded, _isGrounded);
     }
 
 }

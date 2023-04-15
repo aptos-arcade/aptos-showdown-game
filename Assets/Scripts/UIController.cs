@@ -12,22 +12,17 @@ public class UIController : MonoBehaviour
         Instance = this;
     }
 
-    [Header("References")]
+    [Header("Heat References")]
     [SerializeField] private TMP_Text overheatedMessage;
     [SerializeField] private Slider heatSlider;
-
-
-    private void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    private void Update()
-    {
-        
-    }
     
+    [Header("Death References")]
+    [SerializeField] private GameObject deathScreen;
+    [SerializeField] private TMP_Text deathText;
+    
+    [Header("Health References")]
+    [SerializeField] private Slider healthSlider;
+
     public void SetOverheatedMessageActive(bool isOverheated)
     {
         overheatedMessage.gameObject.SetActive(isOverheated);
@@ -37,4 +32,25 @@ public class UIController : MonoBehaviour
     {
         heatSlider.value = heat;
     }
+    
+    public void SetMaxHealthSliderValue(float maxHeat)
+    {
+        healthSlider.maxValue = maxHeat;
+    }
+    
+    public void SetHealthSliderValue(float health)
+    {
+        healthSlider.value = health;
+    }
+    
+    public void SetDeathScreenActive(bool isActive)
+    {
+        deathScreen.SetActive(isActive);
+    }
+
+    public void SetDeathText(string killerName)
+    {
+        deathText.text = $"You were killed by {killerName}";
+    }
+    
 }

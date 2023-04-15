@@ -13,4 +13,7 @@ public class Gun : MonoBehaviour
     
     [SerializeField] private GameObject muzzleFlash;
     public GameObject MuzzleFlash => muzzleFlash;
+    
+    [SerializeField] private int shotDamage;
+    public int ShotDamage => shotDamage;
 }
