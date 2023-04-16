@@ -45,6 +45,7 @@ public class PlayerSpawner : MonoBehaviour
     public void OnDeath(string killerName)
     {
         UIController.Instance.SetDeathText(killerName);
+        MatchManager.Instance.UpdateStatSend(PhotonNetwork.LocalPlayer.ActorNumber, 1, 1);
         if(_player != null) StartCoroutine(DeathCoroutine());
     }
     

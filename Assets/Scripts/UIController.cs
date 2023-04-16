@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
@@ -22,6 +23,16 @@ public class UIController : MonoBehaviour
     
     [Header("Health References")]
     [SerializeField] private Slider healthSlider;
+    
+    [Header("KD References")]
+    [SerializeField] private TMP_Text killsText;
+    [SerializeField] private TMP_Text deathsText;
+    
+    [Header("Leaderboard References")]
+    [SerializeField] private GameObject leaderboardScreen;
+    [SerializeField] private GameObject leaderboardPlayerInfo;
+    public GameObject LeaderboardScreen => leaderboardScreen;
+    public GameObject LeaderboardPlayerInfo => leaderboardPlayerInfo;
 
     public void SetOverheatedMessageActive(bool isOverheated)
     {
@@ -52,5 +63,27 @@ public class UIController : MonoBehaviour
     {
         deathText.text = $"You were killed by {killerName}";
     }
+    
+    public void SetKillsText(int kills)
+    {
+        killsText.text = $"Kills: {kills}";
+    }
+    
+    public void SetDeathsText(int deaths)
+    {
+        deathsText.text = $"Deaths: {deaths}";
+    }
+    
+    public void SetLeaderboardScreenActive(bool isActive)
+    {
+        leaderboardScreen.SetActive(isActive);
+    }
+    
+    public void HideDefaultLeaderboardPlayerInfo()
+    {
+        leaderboardPlayerInfo.SetActive(false);
+    }
+    
+    
     
 }

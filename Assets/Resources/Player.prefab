@@ -285,7 +285,7 @@ MonoBehaviour:
   playerModel: {fileID: 7712055432799731399}
   modelGunPoint: {fileID: 3446357408646456999}
   gunHolder: {fileID: 4200762491872145420}
-  mouseSensitivity: 3
+  mouseSensitivity: 2
   invertLook: 0
   moveSpeed: 5
   runSpeed: 8
