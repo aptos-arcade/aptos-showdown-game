@@ -1,4 +1,5 @@
 using System;
+using Photon.Pun;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
@@ -38,12 +39,26 @@ public class UIController : MonoBehaviour
     [Header("Timer References")]
     [SerializeField] private TMP_Text timerText;
     
-    
+    [Header("Options Menu References")]
+    [SerializeField] private GameObject optionsMenu;
+
+
     // properties
     public GameObject LeaderboardScreen => leaderboardScreen;
     public GameObject LeaderboardPlayerInfo => leaderboardPlayerInfo;
-    
-    
+    public bool IsOptionsMenuActive => optionsMenu.activeSelf;
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            ShowHideOptions();
+        }
+
+        if (!IsOptionsMenuActive || Cursor.lockState == CursorLockMode.None) return;
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+    }
 
     public void SetOverheatedMessageActive(bool isOverheated)
     {
@@ -109,5 +124,20 @@ public class UIController : MonoBehaviour
     {
         timerText.text = TimeSpan.FromSeconds(time).ToString(@"mm\:ss");
     }
+
+    public void ShowHideOptions()
+    {
+        optionsMenu.SetActive(!IsOptionsMenuActive);
+    }
     
+    public void ReturnToMainMenu()
+    {
+        PhotonNetwork.AutomaticallySyncScene = false;
+        PhotonNetwork.LeaveRoom();
+    }
+    
+    public void QuitGame()
+    {
+        Application.Quit();
+    }
 }

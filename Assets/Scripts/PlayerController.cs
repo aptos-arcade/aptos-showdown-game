@@ -18,6 +18,11 @@ public class PlayerController : MonoBehaviourPunCallbacks
     [SerializeField] private GameObject playerModel;
     [SerializeField] private Transform modelGunPoint;
     [SerializeField] private Transform gunHolder;
+    [SerializeField] private Material[] playerSkins;
+    [SerializeField] private Transform adsInPoint;
+    [SerializeField] private Transform adsOutPoint;
+    [SerializeField] private AudioSource footstepsSlow;
+    [SerializeField] private AudioSource footstepsFast;
 
     // user settings; set in Inspector - this will be changed later
     [Header("User Settings")]
@@ -38,6 +43,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
     [SerializeField] private float coolRate = 4f;
     [SerializeField] private float overheatCoolRate = 5f;
     [SerializeField] private float muzzleFlashDuration = 0.1f;
+    [SerializeField] private float adsSpeed = 10f;
 
     // private references; set in Start
     private Camera _camera;
@@ -92,6 +98,10 @@ public class PlayerController : MonoBehaviourPunCallbacks
             gunHolder.localRotation = Quaternion.identity;
         }
         
+        // set initial skin
+        playerModel.GetComponent<Renderer>().material =
+            playerSkins[PhotonNetwork.LocalPlayer.ActorNumber % playerSkins.Length];
+
     }
 
     // Update is called once per frame
@@ -104,6 +114,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
         HandleShoot();
         HandleChangeGun();
         HandleAnimation();
+        HandleZoom();
     }
     
     private void LateUpdate()
@@ -146,9 +157,34 @@ public class PlayerController : MonoBehaviourPunCallbacks
         // get movement input
         _moveDirection = new Vector3(Input.GetAxisRaw("Horizontal"), 0f, Input.GetAxisRaw("Vertical")).normalized;
         _activeMoveSpeed = Input.GetKey(KeyCode.LeftShift) ? runSpeed : moveSpeed;
-        
+
         // check if grounded
         _isGrounded = Physics.CheckSphere(groundCheckPoint.position, 0.25f, groundLayer);
+        
+        if (Input.GetKey(KeyCode.LeftShift))
+        {
+            _activeMoveSpeed = runSpeed;
+            if (!footstepsFast.isPlaying && _moveDirection != Vector3.zero)
+            {
+                footstepsFast.Play();
+                footstepsSlow.Stop();
+            }
+        }
+        else
+        {
+            _activeMoveSpeed = moveSpeed;
+            if (!footstepsSlow.isPlaying && _moveDirection != Vector3.zero)
+            {
+                footstepsSlow.Play();
+                footstepsFast.Stop();
+            }
+        }
+        
+        if (_moveDirection == Vector3.zero || !_isGrounded)
+        {
+            footstepsSlow.Stop();
+            footstepsFast.Stop();
+        }
 
         // calculate movement vector
         var newMovement = (playerTransform.forward * _moveDirection.z + playerTransform.right * _moveDirection.x) *
@@ -174,11 +210,16 @@ public class PlayerController : MonoBehaviourPunCallbacks
 
     private void HandleMouseLock()
     {
-        if(Input.GetKeyDown(KeyCode.Escape)) 
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
             Cursor.lockState = CursorLockMode.None;
+        }
         else if (Cursor.lockState == CursorLockMode.None && Input.GetMouseButtonDown(0) &&
-                 MatchManager.Instance.CurrentGameState == MatchManager.GameState.Playing)
+                 MatchManager.Instance.CurrentGameState == MatchManager.GameState.Playing &&
+                 !UIController.Instance.IsOptionsMenuActive)
+        {
             Cursor.lockState = CursorLockMode.Locked;
+        }
     }
 
     private void HandleShoot()
@@ -248,7 +289,6 @@ public class PlayerController : MonoBehaviourPunCallbacks
                     Quaternion.LookRotation(hit.normal, Vector3.up));
                 Destroy(bulletImpactObject, 10f);
             }
-            
         }
         
         
@@ -267,6 +307,9 @@ public class PlayerController : MonoBehaviourPunCallbacks
         // show muzzle flash
         allGuns[_currentGunIndex].MuzzleFlash.SetActive(true);
         _muzzleFlashCounter = muzzleFlashDuration;
+        
+        // play shoot sound
+        allGuns[_currentGunIndex].PlaySound();
 
     }
 
@@ -324,6 +367,21 @@ public class PlayerController : MonoBehaviourPunCallbacks
     {
         playerAnimator.SetFloat(Speed, _moveDirection.magnitude);
         playerAnimator.SetBool(Grounded, _isGrounded);
+    }
+    
+    private void HandleZoom()
+    {
+        if (Input.GetKey(KeyCode.RightShift))
+        {
+            _camera.fieldOfView = Mathf.Lerp(_camera.fieldOfView, allGuns[_currentGunIndex].AdsZoom,
+                adsSpeed * Time.deltaTime);
+            gunHolder.position = Vector3.Lerp(gunHolder.position, adsInPoint.position, adsSpeed * Time.deltaTime);
+        }
+        else
+        {
+            _camera.fieldOfView = Mathf.Lerp(_camera.fieldOfView, 60, adsSpeed * Time.deltaTime);
+            gunHolder.position = Vector3.Lerp(gunHolder.position, adsOutPoint.position, adsSpeed * Time.deltaTime);
+        }
     }
 
 }

@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class Gun : MonoBehaviour
@@ -16,4 +17,20 @@ public class Gun : MonoBehaviour
     
     [SerializeField] private int shotDamage;
     public int ShotDamage => shotDamage;
+    
+    [SerializeField] private float adsZoom;
+    public float AdsZoom => adsZoom;
+    
+    private AudioSource _audioSource;
+
+    private void Start()
+    {
+        _audioSource = GetComponent<AudioSource>();
+    }
+    
+    public void PlaySound()
+    {
+        _audioSource.Stop();
+        _audioSource.Play();
+    }
 }
