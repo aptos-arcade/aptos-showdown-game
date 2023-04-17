@@ -6,53 +6,62 @@ using TMPro;
 
 public class Launcher : MonoBehaviourPunCallbacks
 {
-    
+
     public static Launcher Instance;
+
     private void Awake()
     {
         Instance = this;
     }
-    
-    [Header("Loading References")]
+
+    [Header("Loading References")] 
     [SerializeField] private GameObject loadingScreen;
     [SerializeField] private TMP_Text loadingText;
-    
-    [Header("Menu Buttons References")]
+
+    [Header("Menu Buttons References")] 
     [SerializeField] private GameObject menuButtons;
     [SerializeField] private GameObject roomTestButton;
 
-    [Header("Create Room References")]
+    [Header("Create Room References")] 
     [SerializeField] private GameObject findRoomScreen;
     [SerializeField] private TMP_InputField roomNameInput;
-    
-    [Header("Room References")]
+
+    [Header("Room References")] 
     [SerializeField] private GameObject roomScreen;
     [SerializeField] private TMP_Text roomNameText;
     [SerializeField] private TMP_Text playerNameLabel;
     [SerializeField] private GameObject startButton;
-    
-    [Header("Error References")]
+
+    [Header("Error References")] 
     [SerializeField] private GameObject errorScreen;
     [SerializeField] private TMP_Text errorText;
-    
-    [Header("Room Browser References")]
+
+    [Header("Room Browser References")] 
     [SerializeField] private GameObject roomBrowserScreen;
     [SerializeField] private GameObject roomButton;
-    
-    [Header("Name Input References")]
+
+    [Header("Name Input References")] 
     [SerializeField] private GameObject nameInputScreen;
     [SerializeField] private TMP_InputField nameInput;
     
+    [Header("Configuration")]
+    [SerializeField] private bool changeMapsBetweenRounds = true;
+    public bool ChangeMapsBetweenRounds => changeMapsBetweenRounds;
+
     // private menu state
     private readonly List<RoomButton> _allRoomButtons = new();
     private readonly List<TMP_Text> _allPlayerLabels = new();
-    private bool _hasSetNickname;
-    
+    private static bool _hasSetNickname;
+
     // constants
     private const string PlayerNameKey = "playerName";
-    private string TestRoomName = "TestRoom";
+    private const string TestRoomName = "TestRoom";
 
-    // Start is called before the first frame update
+    private readonly int[] _levels = { Scenes.Map1BuildIndex, Scenes.Map2BuildIndex };
+    public int[] Levels => _levels;
+    
+
+// Start is called before the first frame update
     private void Start()
     {
         CloseMenus();
@@ -65,6 +74,9 @@ public class Launcher : MonoBehaviourPunCallbacks
         #if UNITY_EDITOR
             roomTestButton.SetActive(true);
         #endif
+        
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
     }
     
     private void CloseMenus()
@@ -251,7 +263,7 @@ public class Launcher : MonoBehaviourPunCallbacks
 
     public void StartGame()
     {
-        PhotonNetwork.LoadLevel(Scenes.GameBuildIndex);
+        PhotonNetwork.LoadLevel(_levels[Random.Range(0, _levels.Length)]);
     }
 
     public override void OnMasterClientSwitched(Player newMasterClient)

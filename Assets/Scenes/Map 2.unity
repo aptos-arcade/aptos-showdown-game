@@ -2053,7 +2053,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 0b91dd02b4dad5e4e9c023c58f82d6a6, type: 3}
       propertyPath: m_LocalScale.x
-      value: 0.5
+      value: -0.5
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 0b91dd02b4dad5e4e9c023c58f82d6a6, type: 3}
       propertyPath: m_LocalScale.y
@@ -2671,6 +2671,10 @@ PrefabInstance:
       value: Match Manager
       objectReference: {fileID: 0}
     - target: {fileID: 7077823956822433476, guid: d445c36dbbc8a4c74a324c9f909e8fee, type: 3}
+      propertyPath: killsToWin
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 7077823956822433476, guid: d445c36dbbc8a4c74a324c9f909e8fee, type: 3}
       propertyPath: endCameraPoint
       value: 
       objectReference: {fileID: 16186272}
@@ -2730,6 +2734,10 @@ PrefabInstance:
     - target: {fileID: 9140048685118507993, guid: aab63cd2d3bf5417c9c9de02e62cd70b, type: 3}
       propertyPath: m_RootOrder
       value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 9140048685118507993, guid: aab63cd2d3bf5417c9c9de02e62cd70b, type: 3}
+      propertyPath: m_LocalScale.x
+      value: -1
       objectReference: {fileID: 0}
     - target: {fileID: 9140048685118507993, guid: aab63cd2d3bf5417c9c9de02e62cd70b, type: 3}
       propertyPath: m_LocalPosition.x

@@ -31,8 +31,19 @@ public class UIController : MonoBehaviour
     [Header("Leaderboard References")]
     [SerializeField] private GameObject leaderboardScreen;
     [SerializeField] private GameObject leaderboardPlayerInfo;
+
+    [Header("Match Over References")]
+    [SerializeField] private GameObject matchOverScreen;
+    
+    [Header("Timer References")]
+    [SerializeField] private TMP_Text timerText;
+    
+    
+    // properties
     public GameObject LeaderboardScreen => leaderboardScreen;
     public GameObject LeaderboardPlayerInfo => leaderboardPlayerInfo;
+    
+    
 
     public void SetOverheatedMessageActive(bool isOverheated)
     {
@@ -84,6 +95,19 @@ public class UIController : MonoBehaviour
         leaderboardPlayerInfo.SetActive(false);
     }
     
+    public void SetMatchOverScreenActive(bool isActive)
+    {
+        matchOverScreen.SetActive(isActive);
+    }
     
+    public void SetTimerActive(bool isActive)
+    {
+        timerText.gameObject.SetActive(isActive);
+    }
+    
+    public void SetTimerText(float time)
+    {
+        timerText.text = TimeSpan.FromSeconds(time).ToString(@"mm\:ss");
+    }
     
 }

@@ -109,8 +109,17 @@ public class PlayerController : MonoBehaviourPunCallbacks
     private void LateUpdate()
     {
         if (!photonView.IsMine) return;
-        _camera.transform.position = viewPoint.position;
-        _camera.transform.rotation = viewPoint.rotation;
+        if (MatchManager.Instance.CurrentGameState == MatchManager.GameState.Playing)
+        {
+            _camera.transform.position = viewPoint.position;
+            _camera.transform.rotation = viewPoint.rotation;
+        }
+        else
+        {
+            _camera.transform.position = MatchManager.Instance.EndCameraPoint.transform.position;
+            _camera.transform.rotation = MatchManager.Instance.EndCameraPoint.transform.rotation;
+        }
+        
     }
     
     private void HandleCamera()
@@ -167,7 +176,8 @@ public class PlayerController : MonoBehaviourPunCallbacks
     {
         if(Input.GetKeyDown(KeyCode.Escape)) 
             Cursor.lockState = CursorLockMode.None;
-        else if (Cursor.lockState == CursorLockMode.None && Input.GetMouseButtonDown(0))
+        else if (Cursor.lockState == CursorLockMode.None && Input.GetMouseButtonDown(0) &&
+                 MatchManager.Instance.CurrentGameState == MatchManager.GameState.Playing)
             Cursor.lockState = CursorLockMode.Locked;
     }
 
