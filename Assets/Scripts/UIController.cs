@@ -35,6 +35,7 @@ public class UIController : MonoBehaviour
 
     [Header("Match Over References")]
     [SerializeField] private GameObject matchOverScreen;
+    [SerializeField] private Button mainMenuButton;
     
     [Header("Timer References")]
     [SerializeField] private TMP_Text timerText;
@@ -43,6 +44,9 @@ public class UIController : MonoBehaviour
     [SerializeField] private GameObject optionsMenu;
     [SerializeField] private Slider mouseSensitivitySlider;
     [SerializeField] private Toggle invertYAxisToggle;
+    [SerializeField] private Button optionsResumeButton;
+    [SerializeField] private Button optionsMainMenuButton;
+    [SerializeField] private Button optionsQuitButton;
 
     // properties
     public GameObject LeaderboardScreen => leaderboardScreen;
@@ -51,11 +55,24 @@ public class UIController : MonoBehaviour
 
     private void Start()
     {
+        AddListeners();
+        
         invertYAxisToggle.onValueChanged.AddListener(isOn => PlayerPreferences.Instance.InvertLook = isOn);
         invertYAxisToggle.isOn = PlayerPreferences.Instance.InvertLook;
         
         mouseSensitivitySlider.onValueChanged.AddListener(value => PlayerPreferences.Instance.MouseSensitivity = value);
         mouseSensitivitySlider.value = PlayerPreferences.Instance.MouseSensitivity;
+    }
+
+    private void AddListeners()
+    {
+        // end screen
+        mainMenuButton.onClick.AddListener(ReturnToMainMenu);
+        
+        // options menu
+        optionsResumeButton.onClick.AddListener(ShowHideOptions);
+        optionsMainMenuButton.onClick.AddListener(ReturnToMainMenu);
+        optionsQuitButton.onClick.AddListener(QuitGame);
     }
 
     private void Update()
