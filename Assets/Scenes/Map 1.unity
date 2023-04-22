@@ -2799,6 +2799,10 @@ PrefabInstance:
       value: Match Manager
       objectReference: {fileID: 0}
     - target: {fileID: 7077823956822433476, guid: d445c36dbbc8a4c74a324c9f909e8fee, type: 3}
+      propertyPath: killsToWin
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 7077823956822433476, guid: d445c36dbbc8a4c74a324c9f909e8fee, type: 3}
       propertyPath: endCameraPoint
       value: 
       objectReference: {fileID: 16186272}

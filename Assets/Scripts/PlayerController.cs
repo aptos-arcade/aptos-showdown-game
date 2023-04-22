@@ -120,17 +120,18 @@ public class PlayerController : MonoBehaviourPunCallbacks
     private void LateUpdate()
     {
         if (!photonView.IsMine) return;
+        var cameraTransform = _camera.transform;
         if (MatchManager.Instance.CurrentGameState == MatchManager.GameState.Playing)
         {
-            _camera.transform.position = viewPoint.position;
-            _camera.transform.rotation = viewPoint.rotation;
+            cameraTransform.position = viewPoint.position;
+            cameraTransform.rotation = viewPoint.rotation;
         }
         else
         {
-            _camera.transform.position = MatchManager.Instance.EndCameraPoint.transform.position;
-            _camera.transform.rotation = MatchManager.Instance.EndCameraPoint.transform.rotation;
+            var endCameraTransform = MatchManager.Instance.EndCameraPoint;
+            cameraTransform.position = endCameraTransform.position;
+            cameraTransform.rotation = endCameraTransform.rotation;
         }
-        
     }
     
     private void HandleCamera()
@@ -311,6 +312,12 @@ public class PlayerController : MonoBehaviourPunCallbacks
         // play shoot sound
         allGuns[_currentGunIndex].PlaySound();
 
+    }
+    
+    [PunRPC]
+    public void ShowMuzzleFlash()
+    {
+        allGuns[_currentGunIndex].MuzzleFlash.SetActive(true);
     }
 
     [PunRPC]

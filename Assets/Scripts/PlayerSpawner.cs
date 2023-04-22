@@ -1,6 +1,4 @@
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 
@@ -37,7 +35,7 @@ public class PlayerSpawner : MonoBehaviour
         _player = PhotonNetwork.Instantiate(playerPrefab.name, spawnPoint.position, spawnPoint.rotation);
     }
     
-    public void DestroyPlayer()
+    private void DestroyPlayer()
     {
         PhotonNetwork.Destroy(_player);
     }

@@ -325,10 +325,12 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
 
-        if (Camera.main != null)
+        var mainCamera = Camera.main;
+        if (mainCamera != null)
         {
-            Camera.main.transform.position = endCameraPoint.position;
-            Camera.main.transform.rotation = endCameraPoint.rotation;
+            var mainCameraTransform = mainCamera.transform;
+            mainCameraTransform.position = endCameraPoint.position;
+            mainCameraTransform.rotation = endCameraPoint.rotation;
         }
 
         StartCoroutine(EndCoroutine());

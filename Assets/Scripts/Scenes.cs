@@ -1,4 +1,4 @@
-public class Scenes
+public static class Scenes
 {
     private const int MainMenu = 0;
     public static int MainMenuBuildIndex => MainMenu;
