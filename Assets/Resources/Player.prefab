@@ -504,18 +504,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   viewPoint: {fileID: 4200762491491185816}
   groundCheckPoint: {fileID: 4200762492555099843}
+  modelGunPoint: {fileID: 3446357408646456999}
+  gunHolder: {fileID: 4200762491872145420}
+  adsInPoint: {fileID: 7017273262745838298}
+  adsOutPoint: {fileID: 5846340064575703619}
+  bulletImpact: {fileID: 6878463686181620656, guid: 26f3fb8fa3be3480baa4db3ddf280366, type: 3}
+  playerHitImpact: {fileID: 6878463686181620656, guid: 2b86ba51fc1cb4892ae16570e6e4ff11, type: 3}
+  playerModel: {fileID: 7712055432799731399}
   groundLayer:
     serializedVersion: 2
     m_Bits: 64
-  bulletImpact: {fileID: 6878463686181620656, guid: 26f3fb8fa3be3480baa4db3ddf280366, type: 3}
   allGuns:
   - {fileID: 4200762492243358873}
   - {fileID: 4200762492370850713}
   - {fileID: 4200762492051029192}
-  playerHitImpact: {fileID: 6878463686181620656, guid: 2b86ba51fc1cb4892ae16570e6e4ff11, type: 3}
-  playerModel: {fileID: 7712055432799731399}
-  modelGunPoint: {fileID: 3446357408646456999}
-  gunHolder: {fileID: 4200762491872145420}
   playerSkins:
   - {fileID: 2100000, guid: 77c6cb66aedd8614a9d77ea6c7c4df49, type: 2}
   - {fileID: 2100000, guid: 41928b1c3f87fb74ab84785adb8b26b4, type: 2}
@@ -525,12 +527,8 @@ MonoBehaviour:
   - {fileID: 2100000, guid: 3212f94e07d1deb45aa6a9a29053538a, type: 2}
   - {fileID: 2100000, guid: 4baa1a7cf7fd5e54895a5459a1d0a433, type: 2}
   - {fileID: 2100000, guid: 3cc029f6eccfe434ba9eb087e3e1d33b, type: 2}
-  adsInPoint: {fileID: 7017273262745838298}
-  adsOutPoint: {fileID: 5846340064575703619}
   footstepsSlow: {fileID: 8416396906635834451}
   footstepsFast: {fileID: 2809334827480011439}
-  mouseSensitivity: 2
-  invertLook: 0
   moveSpeed: 5
   runSpeed: 8
   jumpForce: 8

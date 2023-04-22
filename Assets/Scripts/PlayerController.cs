@@ -8,27 +8,30 @@ public class PlayerController : MonoBehaviourPunCallbacks
     private CharacterController _controller;
 
     // references to other game objects; set in Inspector
-    [Header("References")]
+    [Header("Transform References")]
     [SerializeField] private Transform viewPoint;
     [SerializeField] private Transform groundCheckPoint;
-    [SerializeField] private LayerMask groundLayer;
-    [SerializeField] private GameObject bulletImpact;
-    [SerializeField] private Gun[] allGuns;
-    [SerializeField] private GameObject playerHitImpact;
-    [SerializeField] private GameObject playerModel;
     [SerializeField] private Transform modelGunPoint;
     [SerializeField] private Transform gunHolder;
-    [SerializeField] private Material[] playerSkins;
     [SerializeField] private Transform adsInPoint;
     [SerializeField] private Transform adsOutPoint;
+    
+    [Header("Game Object References")]
+    [SerializeField] private GameObject bulletImpact;
+    [SerializeField] private GameObject playerHitImpact;
+    [SerializeField] private GameObject playerModel;
+
+    [Header("Layer References")]
+    [SerializeField] private LayerMask groundLayer;
+    
+    [Header("Skins and Guns")]
+    [SerializeField] private Gun[] allGuns;
+    [SerializeField] private Material[] playerSkins;
+    
+    [Header("Audio References")]
     [SerializeField] private AudioSource footstepsSlow;
     [SerializeField] private AudioSource footstepsFast;
 
-    // user settings; set in Inspector - this will be changed later
-    [Header("User Settings")]
-    [SerializeField] private float mouseSensitivity = 1f;
-    [SerializeField] private bool invertLook;
-    
     // player stats; set in Inspector
     [Header("Player Stats")]
     [SerializeField] private float moveSpeed = 5f; 
@@ -67,7 +70,6 @@ public class PlayerController : MonoBehaviourPunCallbacks
     private static readonly int Speed = Animator.StringToHash("speed");
     private static readonly int Grounded = Animator.StringToHash("grounded");
 
-    // Start is called before the first frame update
     private void Start()
     {
         // lock cursor to game; can be unlocked with Escape key
@@ -104,7 +106,6 @@ public class PlayerController : MonoBehaviourPunCallbacks
 
     }
 
-    // Update is called once per frame
     private void Update()
     {
         if (!photonView.IsMine) return;
@@ -137,7 +138,8 @@ public class PlayerController : MonoBehaviourPunCallbacks
     private void HandleCamera()
     {
         // get mouse input
-        _mouseInput = new Vector2(Input.GetAxisRaw("Mouse X"), Input.GetAxisRaw("Mouse Y")) * mouseSensitivity;
+        _mouseInput = new Vector2(Input.GetAxisRaw("Mouse X"), Input.GetAxisRaw("Mouse Y")) *
+                      PlayerPreferences.Instance.MouseSensitivity;
 
         // horizontal player rotation
         var playerRotation = transform.rotation;
@@ -147,7 +149,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
         // vertical camera rotation
         var viewPointRotation = viewPoint.rotation;
         _verticalRotationStore = Mathf.Clamp(_verticalRotationStore + _mouseInput.y, -60, 60);
-        viewPoint.rotation = Quaternion.Euler((invertLook ? 1 : -1) * _verticalRotationStore,
+        viewPoint.rotation = Quaternion.Euler((PlayerPreferences.Instance.InvertLook ? 1 : -1) * _verticalRotationStore,
             viewPointRotation.eulerAngles.y, viewPointRotation.eulerAngles.z);
     }
     
@@ -312,12 +314,6 @@ public class PlayerController : MonoBehaviourPunCallbacks
         // play shoot sound
         allGuns[_currentGunIndex].PlaySound();
 
-    }
-    
-    [PunRPC]
-    public void ShowMuzzleFlash()
-    {
-        allGuns[_currentGunIndex].MuzzleFlash.SetActive(true);
     }
 
     [PunRPC]

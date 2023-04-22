@@ -41,12 +41,22 @@ public class UIController : MonoBehaviour
     
     [Header("Options Menu References")]
     [SerializeField] private GameObject optionsMenu;
-
+    [SerializeField] private Slider mouseSensitivitySlider;
+    [SerializeField] private Toggle invertYAxisToggle;
 
     // properties
     public GameObject LeaderboardScreen => leaderboardScreen;
     public GameObject LeaderboardPlayerInfo => leaderboardPlayerInfo;
     public bool IsOptionsMenuActive => optionsMenu.activeSelf;
+
+    private void Start()
+    {
+        invertYAxisToggle.onValueChanged.AddListener(isOn => PlayerPreferences.Instance.InvertLook = isOn);
+        invertYAxisToggle.isOn = PlayerPreferences.Instance.InvertLook;
+        
+        mouseSensitivitySlider.onValueChanged.AddListener(value => PlayerPreferences.Instance.MouseSensitivity = value);
+        mouseSensitivitySlider.value = PlayerPreferences.Instance.MouseSensitivity;
+    }
 
     private void Update()
     {
