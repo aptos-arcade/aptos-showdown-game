@@ -3,6 +3,7 @@ using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
 using TMPro;
+using UnityEngine.UI;
 
 public class Launcher : MonoBehaviourPunCallbacks
 {
@@ -20,29 +21,38 @@ public class Launcher : MonoBehaviourPunCallbacks
 
     [Header("Menu Buttons References")] 
     [SerializeField] private GameObject menuButtons;
-    [SerializeField] private GameObject roomTestButton;
+    [SerializeField] private Button toFindRoomButton;
+    [SerializeField] private Button toCreateRoomButton;
+    [SerializeField] private Button quitGameButton;
+    [SerializeField] private Button roomTestButton;
 
     [Header("Create Room References")] 
-    [SerializeField] private GameObject findRoomScreen;
+    [SerializeField] private GameObject createRoomScreen;
     [SerializeField] private TMP_InputField roomNameInput;
+    [SerializeField] private Button createRoomButton;
+    [SerializeField] private Button closeCreateRoomButton;
 
     [Header("Room References")] 
     [SerializeField] private GameObject roomScreen;
     [SerializeField] private TMP_Text roomNameText;
     [SerializeField] private TMP_Text playerNameLabel;
-    [SerializeField] private GameObject startButton;
+    [SerializeField] private Button startButton;
+    [SerializeField] private Button leaveRoomButton;
 
     [Header("Error References")] 
     [SerializeField] private GameObject errorScreen;
     [SerializeField] private TMP_Text errorText;
+    [SerializeField] private Button errorCloseButton;
 
-    [Header("Room Browser References")] 
-    [SerializeField] private GameObject roomBrowserScreen;
+    [Header("Find Room References")] 
+    [SerializeField] private GameObject findRoomScreen;
     [SerializeField] private GameObject roomButton;
+    [SerializeField] private Button closeFindRoomButton;
 
     [Header("Name Input References")] 
     [SerializeField] private GameObject nameInputScreen;
     [SerializeField] private TMP_InputField nameInput;
+    [SerializeField] private Button setNameButton;
     
     [Header("Configuration")]
     [SerializeField] private bool changeMapsBetweenRounds = true;
@@ -57,36 +67,62 @@ public class Launcher : MonoBehaviourPunCallbacks
     private const string PlayerNameKey = "playerName";
     private const string TestRoomName = "TestRoom";
 
-    private readonly int[] _levels = { Scenes.Map1BuildIndex, Scenes.Map2BuildIndex };
-    public int[] Levels => _levels;
-    
+    public int[] Levels { get; } = { Scenes.Map1BuildIndex, Scenes.Map2BuildIndex };
 
-// Start is called before the first frame update
+
+    // Start is called before the first frame update
     private void Start()
     {
+        AddListeners();
         CloseMenus();
-        
+
         loadingScreen.SetActive(true);
         loadingText.text = "Connecting to Network...";
 
         if(!PhotonNetwork.IsConnected) PhotonNetwork.ConnectUsingSettings();
         
         #if UNITY_EDITOR
-            roomTestButton.SetActive(true);
+            roomTestButton.gameObject.SetActive(true);
         #endif
         
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
     }
+
+    private void AddListeners()
+    {
+        // set nickname screen
+        setNameButton.onClick.AddListener(SetNickname);
+        
+        // main menu screen
+        toFindRoomButton.onClick.AddListener(OpenRoomBrowser);
+        toCreateRoomButton.onClick.AddListener(OpenRoomCreate);
+        quitGameButton.onClick.AddListener(QuitGame);
+        roomTestButton.onClick.AddListener(QuickJoin);
+        
+        // create room screen
+        createRoomButton.onClick.AddListener(CreateRoom);
+        closeCreateRoomButton.onClick.AddListener(BackToMenu);
+        
+        // error screen
+        errorCloseButton.onClick.AddListener(BackToMenu);
+        
+        // find room screen
+        closeFindRoomButton.onClick.AddListener(BackToMenu);
+        
+        // room screen
+        leaveRoomButton.onClick.AddListener(LeaveRoom);
+        startButton.onClick.AddListener(StartGame);
+    }
     
     private void CloseMenus()
     {
         loadingScreen.SetActive(false);
-        findRoomScreen.SetActive(false);
+        createRoomScreen.SetActive(false);
         menuButtons.SetActive(false);
         roomScreen.SetActive(false);
         errorScreen.SetActive(false);
-        roomBrowserScreen.SetActive(false);
+        findRoomScreen.SetActive(false);
         nameInputScreen.SetActive(false);
     }
     
@@ -122,7 +158,8 @@ public class Launcher : MonoBehaviourPunCallbacks
     
     public void OpenRoomCreate()
     {
-        findRoomScreen.SetActive(true);
+        CloseMenus();
+        createRoomScreen.SetActive(true);
     }
     
     public void CreateRoom()
@@ -146,7 +183,7 @@ public class Launcher : MonoBehaviourPunCallbacks
         roomNameText.text = PhotonNetwork.CurrentRoom.Name;
         ListAllPlayers();
         
-        startButton.SetActive(PhotonNetwork.IsMasterClient);
+        startButton.gameObject.SetActive(PhotonNetwork.IsMasterClient);
     }
 
     private void ListAllPlayers()
@@ -182,8 +219,8 @@ public class Launcher : MonoBehaviourPunCallbacks
         errorScreen.SetActive(true);
         errorText.text = "Room Creation Failed: " + message;
     }
-    
-    public void CloseErrorScreen()
+
+    private void BackToMenu()
     {
         CloseMenus();
         menuButtons.SetActive(true);
@@ -205,13 +242,8 @@ public class Launcher : MonoBehaviourPunCallbacks
 
     public void OpenRoomBrowser()
     {
-        roomBrowserScreen.SetActive(true);
-    }
-    
-    public void CloseRoomBrowser()
-    {
         CloseMenus();
-        menuButtons.SetActive(true);
+        findRoomScreen.SetActive(true);
     }
 
     public override void OnRoomListUpdate(List<RoomInfo> roomList)
@@ -263,12 +295,12 @@ public class Launcher : MonoBehaviourPunCallbacks
 
     public void StartGame()
     {
-        PhotonNetwork.LoadLevel(_levels[Random.Range(0, _levels.Length)]);
+        PhotonNetwork.LoadLevel(Levels[Random.Range(0, Levels.Length)]);
     }
 
     public override void OnMasterClientSwitched(Player newMasterClient)
     {
-        startButton.SetActive(PhotonNetwork.IsMasterClient);
+        startButton.gameObject.SetActive(PhotonNetwork.IsMasterClient);
     }
     
     public void QuickJoin()
