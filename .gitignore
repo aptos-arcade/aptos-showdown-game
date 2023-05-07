@@ -59,4 +59,6 @@ sysinfo.txt
 crashlytics-build.properties
 
 # IDE
-.idea/
+/.idea
+.DS_Store
+/.DS_Store
