@@ -57,6 +57,9 @@ public class PlayerSpawner : MonoBehaviour
         yield return new WaitForSeconds(deathTime);
         
         UIController.Instance.SetDeathScreenActive(false);
+        UIController.Instance.SetOverheatedMessageActive(false);
+        UIController.Instance.SetHurtEffectActive(false);
+        
         
         if(MatchManager.Instance.CurrentGameState == MatchManager.GameState.Playing && _player == null)
             SpawnPlayer();

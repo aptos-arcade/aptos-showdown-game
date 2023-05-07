@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using Photon.Pun;
 
@@ -54,17 +55,13 @@ public class PlayerController : MonoBehaviourPunCallbacks
     // player state variables; set in Update
     private Vector2 _mouseInput;
     private Vector3 _moveDirection, _movement;
-    private float _verticalRotationStore;
-    private float _activeMoveSpeed;
+    private float _verticalRotationStore, _activeMoveSpeed;
     private bool _isGrounded;
-    private int _currentGunIndex;
-    private int _currentHealth;
+    private int _currentGunIndex, _currentHealth;
     
     // gun state variables
-    private float _shotCounter;
-    private float _heatCounter;
+    private float _shotCounter, _heatCounter, _muzzleFlashCounter;
     private bool _isOverheated;
-    private float _muzzleFlashCounter;
     
     // animator hashes
     private static readonly int Speed = Animator.StringToHash("speed");
@@ -325,6 +322,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
     private void TakeDamage(string damageDealer, int damageAmount, int actorNumber)
     {
         if (!photonView.IsMine) return;
+        StartCoroutine(UIController.Instance.ShowDamageCoroutine());
         
         _currentHealth -= damageAmount;
         
@@ -374,7 +372,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
     
     private void HandleZoom()
     {
-        if (Input.GetKey(KeyCode.RightShift))
+        if (Input.GetKey(KeyCode.RightShift) || Input.GetMouseButton(1))
         {
             _camera.fieldOfView = Mathf.Lerp(_camera.fieldOfView, allGuns[_currentGunIndex].AdsZoom,
                 adsSpeed * Time.deltaTime);

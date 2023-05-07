@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using Photon.Pun;
 using UnityEngine;
 using TMPro;
@@ -24,7 +25,9 @@ public class UIController : MonoBehaviour
     
     [Header("Health References")]
     [SerializeField] private Slider healthSlider;
-    
+    [SerializeField] private GameObject hurtEffect;
+    [SerializeField] private float hurtScreenDuration = 0.5f;
+
     [Header("KD References")]
     [SerializeField] private TMP_Text killsText;
     [SerializeField] private TMP_Text deathsText;
@@ -119,7 +122,7 @@ public class UIController : MonoBehaviour
     
     public void SetKillsText(int kills)
     {
-        killsText.text = $"Kills: {kills}";
+        killsText.text = $"Kills: {kills}/{MatchManager.Instance.KillsToWin}";
     }
     
     public void SetDeathsText(int deaths)
@@ -150,6 +153,18 @@ public class UIController : MonoBehaviour
     public void SetTimerText(float time)
     {
         timerText.text = TimeSpan.FromSeconds(time).ToString(@"mm\:ss");
+    }
+    
+    public void SetHurtEffectActive(bool isActive)
+    {
+        hurtEffect.SetActive(isActive);
+    }
+    
+    public IEnumerator ShowDamageCoroutine()
+    {
+        SetHurtEffectActive(true);
+        yield return new WaitForSeconds(hurtScreenDuration);
+        SetHurtEffectActive(false);
     }
 
     public void ShowHideOptions()

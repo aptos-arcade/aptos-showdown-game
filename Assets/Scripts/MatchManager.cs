@@ -55,6 +55,7 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback
     // properties
     public Transform EndCameraPoint => endCameraPoint;
     public GameState CurrentGameState => _gameState;
+    public int KillsToWin => killsToWin;
 
 
     // Start is called before the first frame update
@@ -69,6 +70,7 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback
         NewPlayerSend(PhotonNetwork.NickName);
         _gameState = GameState.Playing;
         SetupTimer();
+        UpdateStatsDisplay();
 
         if (!PhotonNetwork.IsMasterClient)
         {
